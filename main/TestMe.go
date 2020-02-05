@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	json2 "encoding/json"
 	"fmt"
 	"io"
 )
@@ -8,8 +10,22 @@ import "net/http"
 
 func main() {
 	fmt.Println("ja vi elskar kjøtt og fårepølsa")
-	http.HandleFunc("/kny", handleKny)
-	http.ListenAndServe("localhost:8080", nil)
+	buf, err := json2.Marshal(map[string]string{
+		"name": "Kjetil Nygård",
+		"email": "pulk.hesten@gmail.com",
+		"source_code": "https://github.com/kny78/min-go-test.git",
+	})
+	if err != nil {
+		println("Error found")
+	}
+	buf2 := bytes.NewBuffer( buf)
+	client:=http.Client{
+		Transport:     http.DefaultTransport,
+		CheckRedirect: nil,
+		Jar:           nil,
+		Timeout:       0,
+	}
+	client.Post("http://10.200.233.89:8080/contest", "application/json", buf2)
 }
 
 type Hest struct {
